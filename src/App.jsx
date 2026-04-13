@@ -61,8 +61,13 @@ function App() {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         const delay = +(entry.target.dataset.delay || 0);
-        setTimeout(() => entry.target.classList.add('visible'), delay);
-        animObserver.unobserve(entry.target);
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+          // Don't unobserve FAQ items so they stay visible
+          if (!entry.target.classList.contains('faq-item')) {
+            animObserver.unobserve(entry.target);
+          }
+        }, delay);
       });
     }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
 
@@ -71,10 +76,17 @@ function App() {
       animObserver.observe(el);
     });
 
-    // FAQ visibility safety net
-    setTimeout(() => {
-      document.querySelectorAll('.faq-item').forEach(el => el.classList.add('visible'));
-    }, 1500);
+    // FAQ visibility safety net - ensure they're always visible
+    const ensureFaqVisible = () => {
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.add('visible');
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+    };
+    setTimeout(ensureFaqVisible, 100);
+    setTimeout(ensureFaqVisible, 1500);
+    setTimeout(ensureFaqVisible, 3000);
 
     // Portfolio drag scroll
     const portfolioScroll = document.getElementById('portfolioScroll');
@@ -118,6 +130,14 @@ function App() {
 
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
+    // Ensure all FAQ items remain visible
+    setTimeout(() => {
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.add('visible');
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+    }, 50);
   };
 
   const handleFormSubmit = (e) => {
@@ -133,28 +153,28 @@ function App() {
 
   const faqs = [
     {
-      question: 'What services does Myaluza Civils offer?',
-      answer: 'We specialize in civil engineering (water reticulation, concrete structures, roads) and general building construction (new buildings, renovations, extensions).'
+      question: 'What types of construction projects does <span class="brand-name">Myaluza Civils</span> handle?',
+      answer: '<strong class="brand-name">Myaluza Civils</strong> specializes in two core areas: Civil Engineering — including water reticulation, concrete structures (chambers, retaining walls, culverts), and roads (surfacing, sidewalks, paving, kerbing and channelling) — and General Building, encompassing new builds, renovations, and structural extensions.'
     },
     {
-      question: 'What are your CIDB registrations?',
-      answer: 'We are registered with CIDB as 5 GB PE (General Building) and 6 CE PE (Civil Engineering).'
+      question: 'Is <span class="brand-name">Myaluza Civils</span> BBBEE compliant for government tenders?',
+      answer: 'Yes, <strong class="brand-name">Myaluza Civils</strong> is Level 1 BBBEE certified and 100% Black-Owned, making us an ideal transformation partner for government and private sector projects requiring BBBEE compliance.'
     },
     {
-      question: 'Is Myaluza Civils BBBEE compliant?',
-      answer: 'Yes, we are Level 1 BBBEE certified and 100% Black-Owned, making us an ideal transformation partner for government and private sector projects.'
+      question: 'What is <span class="brand-name">Myaluza Civils\'</span> CIDB grading?',
+      answer: 'We are registered with CIDB as 5 GB PE (General Building) and 6 CE PE (Civil Engineering), enabling us to tender for a wide range of construction and civil engineering projects.'
     },
     {
-      question: 'Where are your offices located?',
-      answer: 'Our head office is in Pietermaritzburg (102 Trelawney Road, Fairmade), with branch offices in Greytown and Durban (Glenwood).'
+      question: 'Where does <span class="brand-name">Myaluza Civils</span> operate?',
+      answer: 'Our head office is in Pietermaritzburg (102 Trelawney Road, Fairmade), with branch offices in Greytown (P17 Inadi Road, Emabovini) and Durban (4 Clarancier House, 184 Clark Road, Glenwood). We serve clients across KwaZulu-Natal.'
     },
     {
-      question: 'What plant equipment do you own?',
-      answer: 'Our owned plant includes 2× TLB 4X4, 2× Tipper Trucks, 1× Water Cart, 1× Excavator, 1× Grader, 1× Roller, and 1× Bob Cat.'
+      question: 'How can I request a joint venture or partnership?',
+      answer: 'Fill out the form in the "Request Our Intelligence" section above, selecting "Joint Venture / Partnership" as your reason. Our team will send our comprehensive Company Profile and arrange a consultation within one business day.'
     },
     {
-      question: 'How can I request your Company Profile?',
-      answer: 'Fill out the form in the "Request Our Intelligence" section above. Our team will send the comprehensive Company Profile document to your email within one business day.'
+      question: 'What makes <span class="brand-name">Myaluza Civils</span> different from other construction contractors?',
+      answer: 'We combine deep technical expertise with genuine partnership values. As a 100% Black-Owned, BBBEE Level 1 company with CIDB grading in both civil and building sectors, we bring compliance, capability, and commitment to every project — backed by owned plant equipment and a proven track record since 2012.'
     }
   ];
 
@@ -445,8 +465,8 @@ function App() {
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="f-reason">Reason for Request *</label>
-                  <select id="f-reason" className="form-input form-select" required onChange={handleInputChange}>
-                    <option value="" disabled selected>Select a reason...</option>
+                  <select id="f-reason" className="form-input form-select" required onChange={handleInputChange} defaultValue="">
+                    <option value="" disabled>Select a reason...</option>
                     <option>Tender / Bid Preparation</option>
                     <option>Joint Venture / Partnership</option>
                     <option>Subcontracting Opportunity</option>
@@ -481,7 +501,7 @@ function App() {
           {faqs.map((faq, index) => (
             <div key={index} className={`faq-item ${openFaq === index ? 'open' : ''}`}>
               <div className="faq-question" onClick={() => toggleFaq(index)} role="button" tabIndex="0" aria-expanded={openFaq === index}>
-                <span>{faq.question}</span>
+                <span dangerouslySetInnerHTML={{__html: faq.question}}></span>
                 <div className="faq-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -490,7 +510,7 @@ function App() {
                 </div>
               </div>
               <div className="faq-answer" style={{maxHeight: openFaq === index ? '500px' : '0'}}>
-                <div className="faq-answer-inner">{faq.answer}</div>
+                <div className="faq-answer-inner" dangerouslySetInnerHTML={{__html: faq.answer}}></div>
               </div>
             </div>
           ))}
