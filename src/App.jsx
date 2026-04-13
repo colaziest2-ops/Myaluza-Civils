@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import logo from './assets/LOGO 3.png';
+import backImg from './assets/Back.jpg';
+import visionImg from './assets/vision 1.png';
+import targetingImg from './assets/targeting.png';
+import bbbeeImg from './assets/BBBEE-White-Background.png';
+import civilEngImg from './assets/Civil Engineering.jpg';
+import generalBuildImg from './assets/General Building.jpg';
+import waterReticulationImg from './assets/Water Reticulation Network.jpg';
+import roadSurfacingImg from './assets/Road Surfacing & Kerbing.jpg';
+import commercialBuildingImg from './assets/Commercial Building Construction.jpg';
+import concreteImg from './assets/concrete retaining walls and culverts.jpg';
+import renovationsImg from './assets/Structural Renovations & Extensions.jpg';
+import pavingImg from './assets/Paving & Sidewalk Projects.jpg';
 
 function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -184,7 +196,7 @@ function App() {
 
       {/* Hero */}
       <section id="hero" aria-label="Hero section">
-        <div className="hero-bg-img" style={{background: 'linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-mid) 100%)'}}></div>
+        <img src={backImg} className="hero-bg-img" alt="Myaluza Civils structural construction project" />
         <div className="hero-left hero-text-shadow">
           <div className="hero-left-overlay" aria-hidden="true"></div>
           <div className="hero-badge" role="note">
@@ -226,17 +238,17 @@ function App() {
             <p className="card-text" style={{marginTop:'1rem',fontSize:'0.82rem',color:'var(--text-muted)'}}>Building infrastructure since 2012 — Reg No: 2012/210804/07</p>
           </div>
           <div className="bento-card col-3 vision-card">
-            <div className="bento-icon-img" style={{fontSize:'3rem'}}>🎯</div>
+            <img src={visionImg} alt="Vision — Myaluza Civils" className="bento-icon-img icon-invert" />
             <div className="card-title">Our Vision</div>
             <p className="card-text">To provide professional, effective and cost-effective services that assist in the building of South Africa's infrastructure.</p>
           </div>
           <div className="bento-card col-5 mission-card">
-            <div className="bento-icon-img" style={{fontSize:'3rem'}}>🚀</div>
+            <img src={targetingImg} alt="Mission — Myaluza Civils" className="bento-icon-img icon-invert" />
             <div className="card-title">Our Mission</div>
             <p className="card-text">To build a network of clients through the provision of professional, consistent and superior services — whilst establishing everlasting relations creating a sustainable environment for our employees and ensuring client confidence.</p>
           </div>
           <div className="bento-card col-4 orange-accent bee-card">
-            <div className="bento-icon-img" style={{fontSize:'3rem',marginBottom:'0.8rem'}}>⭐</div>
+            <img src={bbbeeImg} alt="BBBEE Level 1 Certification" className="bento-icon-img" style={{marginBottom:'0.8rem'}} />
             <div className="card-title">BBBEE Level 1</div>
             <p className="card-text">100% Black-Owned enterprise with the highest BBBEE compliance rating — a trusted transformation partner for government and private sector projects.</p>
           </div>
@@ -276,7 +288,7 @@ function App() {
         <div className="services-layout">
           <div className="service-card">
             <div className="service-number" aria-hidden="true">01</div>
-            <div className="service-card-img-wrap" style={{background:'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4rem'}}>🏗️</div>
+            <div className="service-card-img-wrap"><img src={civilEngImg} alt="Civil engineering culverts and infrastructure" loading="lazy" /></div>
             <h3 className="service-title">Civil Engineering</h3>
             <ul className="service-list">
               <li>Water reticulation — design and installation of piped water supply networks</li>
@@ -286,7 +298,7 @@ function App() {
           </div>
           <div className="service-card">
             <div className="service-number" aria-hidden="true">02</div>
-            <div className="service-card-img-wrap" style={{background:'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4rem'}}>🏢</div>
+            <div className="service-card-img-wrap"><img src={generalBuildImg} alt="General building and commercial construction" loading="lazy" /></div>
             <h3 className="service-title">General Building</h3>
             <ul className="service-list">
               <li>Construction of new residential and commercial buildings</li>
@@ -315,7 +327,7 @@ function App() {
         </div>
         <div className="portfolio-scroll" id="portfolioScroll" role="list">
           <div className="portfolio-card" role="listitem">
-            <div className="portfolio-card-bg">🧱</div>
+            <img src={concreteImg} alt="Concrete structures by Myaluza Civils" className="portfolio-card-photo" />
             <div className="portfolio-card-content">
               <div className="portfolio-card-tag">Concrete Structures</div>
               <div className="portfolio-card-title">Retaining Walls &amp; Culverts</div>
@@ -323,7 +335,7 @@ function App() {
             </div>
           </div>
           <div className="portfolio-card" role="listitem">
-            <div className="portfolio-card-bg">🛣️</div>
+            <img src={pavingImg} alt="Paving and sidewalk infrastructure projects" className="portfolio-card-photo" />
             <div className="portfolio-card-content">
               <div className="portfolio-card-tag">Infrastructure</div>
               <div className="portfolio-card-title">Paving &amp; Sidewalk Projects</div>
@@ -331,7 +343,7 @@ function App() {
             </div>
           </div>
           <div className="portfolio-card" role="listitem">
-            <div className="portfolio-card-bg">🏗️</div>
+            <img src={waterReticulationImg} alt="Water reticulation network" className="portfolio-card-photo" />
             <div className="portfolio-card-content">
               <div className="portfolio-card-tag">Civil Engineering</div>
               <div className="portfolio-card-title">Water Reticulation Network</div>
@@ -339,7 +351,7 @@ function App() {
             </div>
           </div>
           <div className="portfolio-card" role="listitem">
-            <div className="portfolio-card-bg">🏢</div>
+            <img src={commercialBuildingImg} alt="Commercial building construction" className="portfolio-card-photo" />
             <div className="portfolio-card-content">
               <div className="portfolio-card-tag">General Building</div>
               <div className="portfolio-card-title">Commercial Building Construction</div>
@@ -347,11 +359,19 @@ function App() {
             </div>
           </div>
           <div className="portfolio-card" role="listitem">
-            <div className="portfolio-card-bg">🔨</div>
+            <img src={renovationsImg} alt="Structural renovations and extensions" className="portfolio-card-photo" />
             <div className="portfolio-card-content">
               <div className="portfolio-card-tag">Renovations</div>
               <div className="portfolio-card-title">Structural Renovations &amp; Extensions</div>
               <div className="portfolio-card-sub">KwaZulu-Natal Wide</div>
+            </div>
+          </div>
+          <div className="portfolio-card" role="listitem">
+            <img src={roadSurfacingImg} alt="Road surfacing and kerbing projects" className="portfolio-card-photo" />
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">Roads &amp; Infrastructure</div>
+              <div className="portfolio-card-title">Road Surfacing &amp; Kerbing</div>
+              <div className="portfolio-card-sub">Pietermaritzburg Region</div>
             </div>
           </div>
         </div>
