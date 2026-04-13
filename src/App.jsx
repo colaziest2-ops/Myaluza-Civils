@@ -1,304 +1,542 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import CountUp from 'react-countup';
-import logo from './assets/LOGO 1.png';
+import { useState, useEffect } from 'react';
+import './App.css';
+import logo from './assets/LOGO 3.png';
 
-const App = () => {
+function App() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
+  const [formSuccess, setFormSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     company: '',
     email: '',
-    reasoning: '',
+    reason: '',
+    context: ''
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [openFaq, setOpenFaq] = useState(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    // Nav scroll effect
+    const handleScroll = () => {
+      const nav = document.getElementById('mainNav');
+      if (nav) {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    const countObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = +el.dataset.target;
+        const duration = 1800;
+        const step = target / (duration / 16);
+        let current = 0;
+        const timer = setInterval(() => {
+          current += step;
+          if (current >= target) { current = target; clearInterval(timer); }
+          el.textContent = Math.floor(current);
+        }, 16);
+        countObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(c => countObserver.observe(c));
+
+    // Scroll-trigger animations
+    const animObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const delay = +(entry.target.dataset.delay || 0);
+        setTimeout(() => entry.target.classList.add('visible'), delay);
+        animObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.bento-card, .service-card, .faq-item').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 100;
+      animObserver.observe(el);
+    });
+
+    // FAQ visibility safety net
+    setTimeout(() => {
+      document.querySelectorAll('.faq-item').forEach(el => el.classList.add('visible'));
+    }, 1500);
+
+    // Portfolio drag scroll
+    const portfolioScroll = document.getElementById('portfolioScroll');
+    if (portfolioScroll) {
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+
+      portfolioScroll.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - portfolioScroll.offsetLeft;
+        scrollLeft = portfolioScroll.scrollLeft;
+      });
+
+      portfolioScroll.addEventListener('mouseleave', () => { isDown = false; });
+      portfolioScroll.addEventListener('mouseup', () => { isDown = false; });
+      
+      portfolioScroll.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - portfolioScroll.offsetLeft;
+        const walk = (x - startX) * 2;
+        portfolioScroll.scrollLeft = scrollLeft - walk;
+      });
+    }
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const closeMobileNav = () => {
+    setMobileNavOpen(false);
+    document.body.style.overflow = '';
   };
 
-  const handleSubmit = (e) => {
+  const openMobileNavHandler = () => {
+    setMobileNavOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    console.log('Form submitted:', formData);
+    setFormSuccess(true);
+    setTimeout(() => setFormSuccess(false), 5000);
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.id.replace('f-', '')]: e.target.value });
   };
 
   const faqs = [
     {
       question: 'What services does Myaluza Civils offer?',
-      answer: 'We specialize in civil engineering including water reticulation, concrete structures, and roads, as well as general building construction, renovations, and extensions.',
+      answer: 'We specialize in civil engineering (water reticulation, concrete structures, roads) and general building construction (new buildings, renovations, extensions).'
     },
     {
       question: 'What are your CIDB registrations?',
-      answer: 'We are registered with CIDB as 5 GB PE and 6 CE PE.',
+      answer: 'We are registered with CIDB as 5 GB PE (General Building) and 6 CE PE (Civil Engineering).'
     },
     {
       question: 'Is Myaluza Civils BBBEE compliant?',
-      answer: 'Yes, we are Level 1 BBBEE certified and 100% black owned.',
+      answer: 'Yes, we are Level 1 BBBEE certified and 100% Black-Owned, making us an ideal transformation partner for government and private sector projects.'
+    },
+    {
+      question: 'Where are your offices located?',
+      answer: 'Our head office is in Pietermaritzburg (102 Trelawney Road, Fairmade), with branch offices in Greytown and Durban (Glenwood).'
     },
     {
       question: 'What plant equipment do you own?',
-      answer: 'Our owned plant includes 2x TLB 4X4, 2x Tipper Trucks, 1x Water Cart, 1x Excavator, 1x Grader, 1x Roller, and 1x Bob Cat.',
+      answer: 'Our owned plant includes 2× TLB 4X4, 2× Tipper Trucks, 1× Water Cart, 1× Excavator, 1× Grader, 1× Roller, and 1× Bob Cat.'
     },
-  ];
-
-  const projects = [
-    { id: 1, title: 'Urban Building Upgrade', img: 'https://hemptoday.net/wp-content/uploads/2022/07/SA-build01.jpg', alt: 'Construction site in Cape Town with crane and building under construction' },
-    { id: 2, title: 'Modern Educational Facility', img: 'https://structuralsolutions.co.za/wp-content/uploads/2025/01/CLM-1.jpg', alt: 'Contemporary concrete building with palm trees' },
-    { id: 3, title: 'Commercial High-Rise', img: 'https://saaffordablehousing.co.za/wp-content/uploads/2019/05/SASFA1.jpg', alt: 'Aerial view of curved modern office building' },
-    { id: 4, title: 'Large-Scale Development', img: 'https://www.falconprojects.co.za/wp-content/uploads/2025/04/1-1.jpg', alt: 'Building under construction with scaffolding' },
-    { id: 5, title: 'Engineering Team Project', img: 'https://www.fulcrumapp.com/wp-content/uploads/2013/09/SMEC-South-Africa-team.jpg', alt: 'Team of engineers at a site' },
+    {
+      question: 'How can I request your Company Profile?',
+      answer: 'Fill out the form in the "Request Our Intelligence" section above. Our team will send the comprehensive Company Profile document to your email within one business day.'
+    }
   ];
 
   return (
-    <div className="w-full bg-white">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <nav className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <img src={logo} alt="Logo" className="h-10 w-auto" />
-          <ul className="hidden md:flex gap-8">
-            <li><a href="#about" className="text-navy hover:text-orange font-medium text-sm">About</a></li>
-            <li><a href="#services" className="text-navy hover:text-orange font-medium text-sm">Services</a></li>
-            <li><a href="#impact" className="text-navy hover:text-orange font-medium text-sm">Impact</a></li>
-            <li><a href="#portfolio" className="text-navy hover:text-orange font-medium text-sm">Portfolio</a></li>
-            <li><a href="#contact" className="text-navy hover:text-orange font-medium text-sm">Contact</a></li>
-          </ul>
-          <button 
-            className="md:hidden text-navy text-2xl"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? '✕' : '☰'}
-          </button>
-        </nav>
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200">
-            <ul className="flex flex-col">
-              <li><a href="#about" className="block px-4 py-3 text-navy hover:bg-orange hover:text-white" onClick={() => setMobileMenuOpen(false)}>About</a></li>
-              <li><a href="#services" className="block px-4 py-3 text-navy hover:bg-orange hover:text-white" onClick={() => setMobileMenuOpen(false)}>Services</a></li>
-              <li><a href="#impact" className="block px-4 py-3 text-navy hover:bg-orange hover:text-white" onClick={() => setMobileMenuOpen(false)}>Impact</a></li>
-              <li><a href="#portfolio" className="block px-4 py-3 text-navy hover:bg-orange hover:text-white" onClick={() => setMobileMenuOpen(false)}>Portfolio</a></li>
-              <li><a href="#contact" className="block px-4 py-3 text-navy hover:bg-orange hover:text-white" onClick={() => setMobileMenuOpen(false)}>Contact</a></li>
-            </ul>
-          </div>
-        )}
-      </header>
+    <>
+      {/* Custom Cursor */}
+      <div className="cursor" id="cursor"></div>
+      <div className="cursor-trail" id="cursorTrail"></div>
+
+      {/* Mobile Nav */}
+      <nav className={`nav-mobile ${mobileNavOpen ? 'open' : ''}`} id="mobileNav" role="navigation" aria-label="Mobile menu">
+        <button className="nav-mobile-close" id="mobileClose" aria-label="Close menu" onClick={closeMobileNav}>✕</button>
+        <a href="#about" onClick={closeMobileNav}>About</a>
+        <a href="#services" onClick={closeMobileNav}>Services</a>
+        <a href="#portfolio" onClick={closeMobileNav}>Projects</a>
+        <a href="#partner" onClick={closeMobileNav}>Partner</a>
+        <a href="#intelligence" onClick={closeMobileNav}>Intelligence</a>
+        <a href="#contact" onClick={closeMobileNav}>Contact</a>
+      </nav>
+
+      {/* Main Nav */}
+      <nav id="mainNav" role="navigation" aria-label="Main navigation">
+        <div className="nav-logo">
+          <img src={logo} alt="Myaluza Civils (PTY) LTD Logo — Where Tradition Meets Innovation" />
+        </div>
+        <ul className="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#portfolio">Projects</a></li>
+          <li><a href="#partner">Partner</a></li>
+          <li><a href="#intelligence">Intelligence</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#intelligence" className="nav-cta">Get Profile</a></li>
+        </ul>
+        <div className="hamburger" id="hamburger" onClick={openMobileNavHandler} role="button" aria-label="Open menu" tabIndex="0">
+          <span></span><span></span><span></span>
+        </div>
+      </nav>
 
       {/* Hero */}
-      <section className="w-full bg-gradient-to-br from-navy to-orange text-white pt-32 pb-16 mt-[72px]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Where Tradition Meets Innovation</h1>
-              <p className="text-xl md:text-2xl">Building South Africa's Future</p>
-            </div>
-            <div className="h-64 md:h-80 w-full">
-              <video autoPlay loop muted playsInline className="w-full h-full object-cover rounded-lg">
-                <source src="https://cdn.pixabay.com/video/2017/03/03/8104-207208957_large.mp4" type="video/mp4" />
-              </video>
-            </div>
+      <section id="hero" aria-label="Hero section">
+        <div className="hero-bg-img" style={{background: 'linear-gradient(135deg, var(--navy-deep) 0%, var(--navy-mid) 100%)'}}></div>
+        <div className="hero-left hero-text-shadow">
+          <div className="hero-left-overlay" aria-hidden="true"></div>
+          <div className="hero-badge" role="note">
+            <span className="hero-badge-dot" aria-hidden="true"></span>
+            100% Black-Owned &bull; BBBEE Level 1
+          </div>
+          <h1 className="hero-headline">
+            WHERE<br/>
+            <span className="accent">TRADITION</span><br/>
+            MEETS<br/>
+            INNOVATION
+          </h1>
+          <p className="hero-sub">
+            <strong className="brand-name">Myaluza Civils (PTY) LTD</strong> — building South Africa's infrastructure since 2012. Civil engineering and general construction delivered with precision, integrity, and purpose.
+          </p>
+          <div className="hero-actions">
+            <a href="#services" className="btn-primary">Explore Services</a>
+            <a href="#intelligence" className="btn-outline" style={{background: 'var(--navy)', color: 'white', borderColor: 'var(--navy)'}}>Request Profile</a>
+          </div>
+        </div>
+        <div className="hero-scroll-hint" aria-hidden="true">
+          <span>Scroll</span>
+          <div className="scroll-line"></div>
+        </div>
+      </section>
+
+      {/* About / Bento */}
+      <section id="about" aria-labelledby="about-title">
+        <div className="section-label">Who We Are</div>
+        <h2 className="section-title" id="about-title">BUILDING MORE<br/><span style={{color:'var(--orange)'}}>THAN STRUCTURES</span></h2>
+        <div className="bento-grid">
+          <div className="bento-card col-7 dark-accent">
+            <div className="card-title" style={{marginBottom:'0.6rem'}}>Our Background</div>
+            <p className="card-text">Established in 2012 by a group of highly skilled professionals with hands-on construction experience, <strong className="brand-name">Myaluza Civils</strong> was formed to deliver small yet highly specialized civil engineering and building construction services across South Africa. We combine deep technical expertise with a commitment to community development.</p>
+          </div>
+          <div className="bento-card col-5 orange-accent">
+            <div className="big-number counter" data-target="13">0</div>
+            <div className="big-number-label">Years of Experience</div>
+            <p className="card-text" style={{marginTop:'1rem',fontSize:'0.82rem',color:'var(--text-muted)'}}>Building infrastructure since 2012 — Reg No: 2012/210804/07</p>
+          </div>
+          <div className="bento-card col-3 vision-card">
+            <div className="bento-icon-img" style={{fontSize:'3rem'}}>🎯</div>
+            <div className="card-title">Our Vision</div>
+            <p className="card-text">To provide professional, effective and cost-effective services that assist in the building of South Africa's infrastructure.</p>
+          </div>
+          <div className="bento-card col-5 mission-card">
+            <div className="bento-icon-img" style={{fontSize:'3rem'}}>🚀</div>
+            <div className="card-title">Our Mission</div>
+            <p className="card-text">To build a network of clients through the provision of professional, consistent and superior services — whilst establishing everlasting relations creating a sustainable environment for our employees and ensuring client confidence.</p>
+          </div>
+          <div className="bento-card col-4 orange-accent bee-card">
+            <div className="bento-icon-img" style={{fontSize:'3rem',marginBottom:'0.8rem'}}>⭐</div>
+            <div className="card-title">BBBEE Level 1</div>
+            <p className="card-text">100% Black-Owned enterprise with the highest BBBEE compliance rating — a trusted transformation partner for government and private sector projects.</p>
           </div>
         </div>
       </section>
 
-      {/* About */}
-      <section id="about" className="w-full py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">About Myaluza Civils</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow">
-              <h3 className="text-2xl font-bold text-orange mb-4">Background</h3>
-              <p className="text-gray-700">Myaluza Civils (PTY) LTD was established in 2012 by highly skilled professionals to form a specialized civil and construction company. We are 100% black owned.</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow">
-              <h3 className="text-2xl font-bold text-orange mb-4">Vision</h3>
-              <p className="text-gray-700">To provide professional, effective, and cost-effective services to assist in building infrastructure in South Africa.</p>
-            </div>
+      {/* Impact / Stats */}
+      <section id="impact" aria-labelledby="impact-title">
+        <div style={{textAlign:'center',position:'relative',zIndex:1}}>
+          <div className="section-label" style={{justifyContent:'center'}}>By The Numbers</div>
+          <h2 className="section-title" id="impact-title">OUR <span style={{color:'var(--orange)'}}>IMPACT</span></h2>
+        </div>
+        <div className="stats-grid" role="list" style={{position:'relative',zIndex:1}}>
+          <div className="stat-item" role="listitem">
+            <span className="stat-number"><span className="counter" data-target="13">0</span><span className="stat-suffix">+</span></span>
+            <span className="stat-label">Years in Operation</span>
           </div>
-          <div className="bg-white p-8 rounded-lg shadow mt-8">
-            <h3 className="text-2xl font-bold text-orange mb-4">Mission</h3>
-            <p className="text-gray-700">To build a network of clients through superior services, establishing everlasting relations, creating a sustainable environment for employees, and ensuring client confidence.</p>
+          <div className="stat-item" role="listitem">
+            <span className="stat-number"><span className="counter" data-target="3">0</span></span>
+            <span className="stat-label">Office Locations</span>
+          </div>
+          <div className="stat-item" role="listitem">
+            <span className="stat-number"><span className="counter" data-target="20">0</span><span className="stat-suffix">+</span></span>
+            <span className="stat-label">Completed Projects</span>
+          </div>
+          <div className="stat-item" role="listitem">
+            <span className="stat-number"><span className="counter" data-target="100">0</span><span className="stat-suffix">%</span></span>
+            <span className="stat-label">Black-Owned</span>
           </div>
         </div>
       </section>
 
       {/* Services */}
-      <section id="services" className="w-full py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">Our Core Business</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 p-8 rounded-lg border-l-4 border-orange">
-              <h3 className="text-2xl font-bold text-orange mb-4">Civil Engineering</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• Water Reticulation</li>
-                <li>• Concrete Structures</li>
-                <li>• Roads & Infrastructure</li>
-              </ul>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-lg border-l-4 border-orange">
-              <h3 className="text-2xl font-bold text-orange mb-4">General Building</h3>
-              <ul className="space-y-2 text-gray-700">
-                <li>• New Buildings</li>
-                <li>• Renovations</li>
-                <li>• Extensions</li>
-              </ul>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-lg border-l-4 border-orange">
-              <h3 className="text-2xl font-bold text-orange mb-4">Registrations & Plant</h3>
-              <p className="text-gray-700 mb-4">CIDB: 5 GB PE, 6 CE PE<br/>BBBEE: Level 1</p>
-              <ul className="space-y-1 text-sm text-gray-700">
-                <li>• 2x TLB 4X4</li>
-                <li>• 2x Tipper Truck</li>
-                <li>• 1x Excavator</li>
-              </ul>
-            </div>
+      <section id="services" aria-labelledby="services-title">
+        <div className="section-label">What We Do</div>
+        <h2 className="section-title" id="services-title">CORE <span style={{color:'var(--orange)'}}>CAPABILITIES</span></h2>
+        <div className="services-layout">
+          <div className="service-card">
+            <div className="service-number" aria-hidden="true">01</div>
+            <div className="service-card-img-wrap" style={{background:'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4rem'}}>🏗️</div>
+            <h3 className="service-title">Civil Engineering</h3>
+            <ul className="service-list">
+              <li>Water reticulation — design and installation of piped water supply networks</li>
+              <li>Concrete Structures — chambers, retaining walls and culverts</li>
+              <li>Roads — surfacing, sidewalks, paving, kerbing and channel construction</li>
+            </ul>
           </div>
-        </div>
-      </section>
-
-      {/* Impact */}
-      <section id="impact" className="w-full py-16 bg-orange/10">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">Our Impact</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg text-center shadow">
-              <div className="text-5xl font-bold text-orange mb-2">14+</div>
-              <p className="text-xl text-gray-700">Years of Excellence</p>
+          <div className="service-card">
+            <div className="service-number" aria-hidden="true">02</div>
+            <div className="service-card-img-wrap" style={{background:'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4rem'}}>🏢</div>
+            <h3 className="service-title">General Building</h3>
+            <ul className="service-list">
+              <li>Construction of new residential and commercial buildings</li>
+              <li>Renovations to existing structures — upgrade and refurbishment</li>
+              <li>Extensions to existing structures — expanding your footprint</li>
+            </ul>
+          </div>
+          <div className="service-card registrations-card bento-card" style={{opacity:1,transform:'none',boxShadow:'none'}}>
+            <div style={{flex:2,minWidth:'220px'}}>
+              <div className="card-title" style={{color:'#fff',fontFamily:"'Syne',sans-serif",fontSize:'1.05rem',fontWeight:700}}>Industry Registrations &amp; Compliance</div>
+              <p className="card-text" style={{marginTop:'0.6rem',color:'rgba(255,255,255,0.6)'}}>Fully accredited and compliant across all required industry bodies — giving our clients peace of mind on every project.</p>
             </div>
-            <div className="bg-white p-8 rounded-lg text-center shadow">
-              <div className="text-5xl font-bold text-orange mb-2">100+</div>
-              <p className="text-xl text-gray-700">Projects Completed</p>
-            </div>
-            <div className="bg-white p-8 rounded-lg text-center shadow">
-              <div className="text-5xl font-bold text-orange mb-2">1</div>
-              <p className="text-xl text-gray-700">BBBEE Level</p>
-            </div>
+            <div className="reg-badge"><div className="reg-badge-title">CIDB</div><div className="reg-badge-value">5 GB PE</div></div>
+            <div className="reg-badge"><div className="reg-badge-title">CIDB</div><div className="reg-badge-value">6 CE PE</div></div>
+            <div className="reg-badge"><div className="reg-badge-title">BBBEE</div><div className="reg-badge-value">Level 1</div></div>
           </div>
         </div>
       </section>
 
       {/* Portfolio */}
-      <section id="portfolio" className="w-full py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">Portfolio</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {projects.map((project) => (
-              <div key={project.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-                <img src={project.img} alt={project.alt} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h4 className="text-lg font-semibold text-navy">{project.title}</h4>
-                </div>
-              </div>
-            ))}
+      <section id="portfolio" aria-labelledby="portfolio-title">
+        <div className="portfolio-header">
+          <div className="section-label">Our Work</div>
+          <h2 className="section-title" id="portfolio-title">PROJECT <span style={{color:'var(--orange)'}}>SHOWCASE</span></h2>
+          <p style={{color:'var(--text-light)',fontSize:'0.88rem',marginTop:'1rem'}}>← Drag or swipe to explore our portfolio across KwaZulu-Natal</p>
+        </div>
+        <div className="portfolio-scroll" id="portfolioScroll" role="list">
+          <div className="portfolio-card" role="listitem">
+            <div className="portfolio-card-bg">🧱</div>
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">Concrete Structures</div>
+              <div className="portfolio-card-title">Retaining Walls &amp; Culverts</div>
+              <div className="portfolio-card-sub">Greytown Area</div>
+            </div>
+          </div>
+          <div className="portfolio-card" role="listitem">
+            <div className="portfolio-card-bg">🛣️</div>
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">Infrastructure</div>
+              <div className="portfolio-card-title">Paving &amp; Sidewalk Projects</div>
+              <div className="portfolio-card-sub">Municipal Contracts</div>
+            </div>
+          </div>
+          <div className="portfolio-card" role="listitem">
+            <div className="portfolio-card-bg">🏗️</div>
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">Civil Engineering</div>
+              <div className="portfolio-card-title">Water Reticulation Network</div>
+              <div className="portfolio-card-sub">KwaZulu-Natal</div>
+            </div>
+          </div>
+          <div className="portfolio-card" role="listitem">
+            <div className="portfolio-card-bg">🏢</div>
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">General Building</div>
+              <div className="portfolio-card-title">Commercial Building Construction</div>
+              <div className="portfolio-card-sub">Durban, KZN</div>
+            </div>
+          </div>
+          <div className="portfolio-card" role="listitem">
+            <div className="portfolio-card-bg">🔨</div>
+            <div className="portfolio-card-content">
+              <div className="portfolio-card-tag">Renovations</div>
+              <div className="portfolio-card-title">Structural Renovations &amp; Extensions</div>
+              <div className="portfolio-card-sub">KwaZulu-Natal Wide</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Partner */}
-      <section className="w-full py-16 bg-navy text-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Partner with Innovation</h2>
-          <p className="text-lg md:text-xl">Join us in building a better South Africa through cutting-edge civil engineering and construction solutions.</p>
+      <section id="partner" aria-labelledby="partner-title">
+        <div className="section-label" style={{justifyContent:'center'}}>Collaboration</div>
+        <h2 className="section-title" id="partner-title" style={{textAlign:'center'}}>PARTNER WITH<br/><span style={{color:'var(--orange)'}}>INNOVATION</span></h2>
+        <p style={{color:'var(--text-muted)',fontSize:'1rem',maxWidth:'560px',margin:'1.5rem auto 0',lineHeight:1.8,textAlign:'center'}}>
+          Whether you're a government body, private developer, or fellow contractor, <strong className="brand-name">Myaluza Civils</strong> brings BBBEE Level 1 compliance, CIDB-graded expertise, and genuine partnership values to every engagement.
+        </p>
+        <div className="partner-grid">
+          <div className="partner-pill">Government &amp; Municipal</div>
+          <div className="partner-pill">Private Developers</div>
+          <div className="partner-pill">Joint Ventures</div>
+          <div className="partner-pill">Subcontracting</div>
+          <div className="partner-pill">BBBEE Compliance Partner</div>
+          <div className="partner-pill">Infrastructure Projects</div>
+        </div>
+        <div style={{marginTop:'3rem',textAlign:'center'}}>
+          <a href="#intelligence" className="btn-primary">Request Our Company Profile ›</a>
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="w-full py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">Request Our Intelligence</h2>
-          <div className="max-w-md mx-auto">
-            <form onSubmit={handleSubmit} className="bg-gray-50 p-8 rounded-lg shadow">
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full mb-4 p-3 rounded border border-gray-300"
-                required
-              />
-              <input
-                type="text"
-                name="company"
-                placeholder="Company"
-                value={formData.company}
-                onChange={handleChange}
-                className="w-full mb-4 p-3 rounded border border-gray-300"
-                required
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full mb-4 p-3 rounded border border-gray-300"
-                required
-              />
-              <textarea
-                name="reasoning"
-                placeholder="Reasoning for Request"
-                value={formData.reasoning}
-                onChange={handleChange}
-                className="w-full mb-4 p-3 rounded border border-gray-300"
-                rows="4"
-                required
-              />
-              <button
-                type="submit"
-                className="w-full bg-orange text-white py-3 rounded font-bold hover:bg-orange/80 transition"
-              >
-                Submit
-              </button>
-            </form>
-            {submitted && (
-              <div className="mt-4 p-4 bg-green-100 text-green-700 rounded text-center">
-                Thank You! Your request has been submitted.
+      {/* Intelligence / Lead Gen */}
+      <section id="intelligence" aria-labelledby="intel-title">
+        <div className="intelligence-wrap">
+          <div className="intel-left">
+            <div className="section-label">Company Intelligence</div>
+            <h2 className="section-title" id="intel-title">REQUEST OUR<br/><span style={{color:'var(--orange)'}}>INTELLIGENCE</span></h2>
+            <p>Our Company Profile is a curated intelligence document — containing our full capabilities, compliance certificates, CIDB grading, project history, and team credentials. Request it below to begin a formal engagement.</p>
+            <div className="intel-features">
+              <div className="intel-feature">
+                <div className="intel-feature-dot"></div>
+                <span>Full CIDB registration details &amp; compliance certificates</span>
               </div>
-            )}
+              <div className="intel-feature">
+                <div className="intel-feature-dot"></div>
+                <span>BBBEE Level 1 certificate &amp; ownership structure</span>
+              </div>
+              <div className="intel-feature">
+                <div className="intel-feature-dot"></div>
+                <span>Detailed project portfolio with references</span>
+              </div>
+              <div className="intel-feature">
+                <div className="intel-feature-dot"></div>
+                <span>Owned plant &amp; equipment inventory</span>
+              </div>
+              <div className="intel-feature">
+                <div className="intel-feature-dot"></div>
+                <span>Team credentials &amp; professional qualifications</span>
+              </div>
+            </div>
           </div>
-          <div className="mt-12 text-center text-gray-700 max-w-2xl mx-auto">
-            <p className="mb-2 text-sm md:text-base"><strong>Head Office:</strong> 102 Trelawney Road, Fairmade, Pietermaritzburg 3201</p>
-            <p className="mb-2 text-sm md:text-base"><strong>Branch:</strong> P17 Inadi Road, Emabovini, Greytown 3250</p>
-            <p className="mb-2 text-sm md:text-base"><strong>Branch:</strong> 4 Claranier House, 184 Clark Road, Glenwood, Durban 4001</p>
-            <p className="mb-2 text-sm md:text-base"><strong>Cell:</strong> 078 349 2494 | 079 767 0766</p>
-            <p className="text-sm md:text-base"><strong>Email:</strong> admin@myaluzacivils.co.za</p>
+          <div className="form-card">
+            <div id="formContainer" style={{display: formSuccess ? 'none' : 'block'}}>
+              <div className="form-title">Fill in your details below</div>
+              <form id="profileForm" onSubmit={handleFormSubmit}>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="f-name">Full Name *</label>
+                  <input id="f-name" type="text" className="form-input" placeholder="Your full name" required autoComplete="name" onChange={handleInputChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="f-company">Company / Organisation *</label>
+                  <input id="f-company" type="text" className="form-input" placeholder="Your company name" required autoComplete="organization" onChange={handleInputChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="f-email">Email Address *</label>
+                  <input id="f-email" type="email" className="form-input" placeholder="your@company.co.za" required autoComplete="email" onChange={handleInputChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="f-reason">Reason for Request *</label>
+                  <select id="f-reason" className="form-input form-select" required onChange={handleInputChange}>
+                    <option value="" disabled selected>Select a reason...</option>
+                    <option>Tender / Bid Preparation</option>
+                    <option>Joint Venture / Partnership</option>
+                    <option>Subcontracting Opportunity</option>
+                    <option>Project Evaluation</option>
+                    <option>General Enquiry</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="f-context">Additional Context</label>
+                  <textarea id="f-context" className="form-input form-textarea" placeholder="Tell us more about your project or requirements..." onChange={handleInputChange}></textarea>
+                </div>
+                <button type="submit" className="btn-primary form-submit">Request Intelligence Document →</button>
+              </form>
+            </div>
+            <div className="form-success" id="formSuccess" role="alert" style={{display: formSuccess ? 'flex' : 'none'}}>
+              <div className="form-success-icon">✅</div>
+              <h3>Request Received!</h3>
+              <p>Thank you. Our team will send our Company Profile to your email within one business day.</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="w-full py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-navy mb-12">Common Construction Queries</h2>
-          <div className="max-w-2xl mx-auto space-y-4">
-            {faqs.map((faq, index) => (
-              <div key={index} className="bg-white rounded-lg shadow">
-                <button
-                  className="w-full text-left p-4 flex justify-between items-center hover:bg-gray-50"
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                >
-                  <span className="font-bold text-navy">{faq.question}</span>
-                  <span className="text-2xl text-orange">{openFaq === index ? '−' : '+'}</span>
-                </button>
-                {openFaq === index && (
-                  <div className="p-4 bg-gray-50 border-t border-gray-200">
-                    <p className="text-gray-700">{faq.answer}</p>
-                  </div>
-                )}
+      <section id="faq" aria-labelledby="faq-title">
+        <div>
+          <div className="section-label" style={{justifyContent:'center'}}>Common Questions</div>
+          <h2 className="section-title" id="faq-title" style={{textAlign:'center'}}>CONSTRUCTION<br/><span style={{color:'var(--orange)'}}>QUERIES</span></h2>
+        </div>
+        <div className="faq-list">
+          {faqs.map((faq, index) => (
+            <div key={index} className={`faq-item ${openFaq === index ? 'open' : ''}`}>
+              <div className="faq-question" onClick={() => toggleFaq(index)} role="button" tabIndex="0" aria-expanded={openFaq === index}>
+                <span>{faq.question}</span>
+                <div className="faq-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </div>
               </div>
-            ))}
+              <div className="faq-answer" style={{maxHeight: openFaq === index ? '500px' : '0'}}>
+                <div className="faq-answer-inner">{faq.answer}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" aria-labelledby="contact-title">
+        <div className="section-label">Get In Touch</div>
+        <h2 className="section-title" id="contact-title">REACH<br/><span style={{color:'var(--orange)'}}>OUR TEAM</span></h2>
+        <div className="contact-grid">
+          <div className="contact-card">
+            <div className="contact-card-label">Head Office</div>
+            <div className="contact-card-text">
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>102 Trelawney Road, Fairmade<br/>Pietermaritzburg, 3201</span>
+              </div>
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.9-.9a2 2 0 0 1 2.1-.45c.9.33 1.85.56 2.81.69a2 2 0 0 1 1.72 2.03z"/></svg>
+                <span><a href="tel:0783492494">078 349 2494</a><br/><a href="tel:0797870766">079 787 0766</a></span>
+              </div>
+            </div>
+          </div>
+          <div className="contact-card">
+            <div className="contact-card-label">Branch Offices</div>
+            <div className="contact-card-text">
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>P17 Inadi Road, Emabovini<br/>Greytown, 3250</span>
+              </div>
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>4 Clarancier House, 184 Clark Road<br/>Glenwood, Durban, 4001</span>
+              </div>
+            </div>
+          </div>
+          <div className="contact-card">
+            <div className="contact-card-label">Digital Contact</div>
+            <div className="contact-card-text">
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span><a href="mailto:admin@myaluzacivils.co.za">admin@myaluzacivils.co.za</a></span>
+              </div>
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+                <span>Fax: 086 764 1531</span>
+              </div>
+              <div className="contact-info-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Reg No: 2012/210804/07<br/>CIDB: 5 GB PE | 6 CE PE<br/>BBBEE: Level 1</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="w-full py-6 bg-navy text-white text-center">
-        <p>&copy; 2026 Myaluza Civils (Pty) Ltd. All rights reserved.</p>
+      <footer>
+        <div className="footer-logo">
+          <img src={logo} alt="Myaluza Civils PTY LTD — Where Tradition Meets Innovation" />
+        </div>
+        <div className="footer-text">© 2025 <strong className="brand-name">Myaluza Civils (PTY) LTD</strong>. All rights reserved.</div>
       </footer>
-    </div>
+    </>
   );
-};
+}
 
 export default App;
