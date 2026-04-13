@@ -1074,6 +1074,13 @@
       gap: 1rem;
       user-select: none;
       transition: color 0.3s;
+      width: 100%;
+    }
+    
+    .faq-question span {
+      flex: 1;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     .faq-question:hover { color: var(--orange); }
