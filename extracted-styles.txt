@@ -1,4 +1,5 @@
-/*
+  <style>
+    /*
     ════════════════════════════════════════════
     MYALUZA CIVILS — LIGHT THEME PALETTE
     ════════════════════════════════════════════
@@ -1505,3 +1506,4 @@
       .service-card-img-wrap { height: 150px; }
       .bento-icon-img { width: 56px; height: 56px; }
     }
+  </style>
