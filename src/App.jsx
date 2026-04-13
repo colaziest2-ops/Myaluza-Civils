@@ -18,6 +18,7 @@ function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
   const [formSuccess, setFormSuccess] = useState(false);
+  const [showBackTop, setShowBackTop] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -33,8 +34,24 @@ function App() {
       if (nav) {
         nav.classList.toggle('scrolled', window.scrollY > 60);
       }
+      setShowBackTop(window.scrollY > 400);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Custom cursor tracking
+    const cursorDot = document.getElementById('cursor');
+    const cursorTrail = document.getElementById('cursorTrail');
+    const handleMouseMove = (e) => {
+      if (cursorDot) {
+        cursorDot.style.left = e.clientX - 5 + 'px';
+        cursorDot.style.top = e.clientY - 5 + 'px';
+      }
+      if (cursorTrail) {
+        cursorTrail.style.left = e.clientX + 'px';
+        cursorTrail.style.top = e.clientY + 'px';
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
 
     // Counter animation
     const counters = document.querySelectorAll('.counter');
@@ -111,10 +128,26 @@ function App() {
         const walk = (x - startX) * 2;
         portfolioScroll.scrollLeft = scrollLeft - walk;
       });
+
+      portfolioScroll.addEventListener('touchstart', (e) => {
+        isDown = true;
+        startX = e.touches[0].pageX - portfolioScroll.offsetLeft;
+        scrollLeft = portfolioScroll.scrollLeft;
+      }, { passive: true });
+
+      portfolioScroll.addEventListener('touchend', () => { isDown = false; });
+
+      portfolioScroll.addEventListener('touchmove', (e) => {
+        if (!isDown) return;
+        const x = e.touches[0].pageX - portfolioScroll.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        portfolioScroll.scrollLeft = scrollLeft - walk;
+      }, { passive: true });
     }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
@@ -140,11 +173,22 @@ function App() {
     }, 50);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setFormSuccess(true);
-    setTimeout(() => setFormSuccess(false), 5000);
+    try {
+      const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (res.ok) {
+        setFormSuccess(true);
+        setFormData({ name: '', company: '', email: '', reason: '', context: '' });
+        setTimeout(() => setFormSuccess(false), 6000);
+      }
+    } catch (err) {
+      console.error('Form submission error:', err);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -209,7 +253,7 @@ function App() {
           <li><a href="#contact">Contact</a></li>
           <li><a href="#intelligence" className="nav-cta">Get Profile</a></li>
         </ul>
-        <div className="hamburger" id="hamburger" onClick={openMobileNavHandler} role="button" aria-label="Open menu" tabIndex="0">
+        <div className="hamburger" id="hamburger" onClick={openMobileNavHandler} role="button" aria-label="Open menu" tabIndex="0" aria-expanded={mobileNavOpen} aria-controls="mobileNav">
           <span></span><span></span><span></span>
         </div>
       </nav>
@@ -573,8 +617,18 @@ function App() {
         <div className="footer-logo">
           <img src={logo} alt="Myaluza Civils PTY LTD — Where Tradition Meets Innovation" />
         </div>
-        <div className="footer-text">© 2025 <strong className="brand-name">Myaluza Civils (PTY) LTD</strong>. All rights reserved.</div>
+        <div className="footer-text">© {new Date().getFullYear()} <strong className="brand-name">Myaluza Civils (PTY) LTD</strong>. All rights reserved.</div>
       </footer>
+
+      {showBackTop && (
+        <button
+          className="back-to-top"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
+      )}
     </>
   );
 }

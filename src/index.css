@@ -45,6 +45,11 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    #about, #impact, #services, #portfolio,
+    #partner, #intelligence, #faq, #contact {
+      scroll-margin-top: 80px;
+    }
     html { scroll-behavior: smooth; overflow-x: hidden; max-width: 100%; }
 
     body {
@@ -1252,9 +1257,14 @@
 
       /* Mobile hero full-bleed */
       .hero-left-overlay { background: linear-gradient(180deg, rgba(245,247,250,0.12) 0%, rgba(13,31,60,0.6) 60%, rgba(13,31,60,0.8) 100%) !important; }
-      .hero-headline { color: #0D1F3C !important; }
+      .hero-headline { color: #FFFFFF !important; }
       .hero-headline .accent { color: var(--orange) !important; }
-      .hero-sub { color: rgba(255,255,255,0.85) !important; }
+      .hero-sub { color: rgba(255,255,255,0.88) !important; }
+      .hero-badge {
+        background: rgba(244,121,32,0.18) !important;
+        border-color: rgba(244,121,32,0.5) !important;
+        color: #FFB07A !important;
+      }
 
       /* Logo: larger, visually prominent on mobile */
       .nav-logo img {
@@ -1515,4 +1525,29 @@
     @media (max-width: 600px) {
       .service-card-img-wrap { height: 150px; }
       .bento-icon-img { width: 56px; height: 56px; }
+    }
+
+    /* ── BACK TO TOP BUTTON ─────────────────────────── */
+    .back-to-top {
+      position: fixed;
+      bottom: 1.8rem;
+      right: 1.8rem;
+      z-index: 900;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(244,121,32,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .back-to-top:hover {
+      background: var(--orange-hover);
+      transform: translateY(-2px);
     }
