@@ -378,6 +378,8 @@ function App() {
             <div className="reg-badge"><div className="reg-badge-title">CIDB</div><div className="reg-badge-value">5 GB PE</div></div>
             <div className="reg-badge"><div className="reg-badge-title">CIDB</div><div className="reg-badge-value">6 CE PE</div></div>
             <div className="reg-badge"><div className="reg-badge-title">BBBEE</div><div className="reg-badge-value">Level 1</div></div>
+            <div className="reg-badge"><div className="reg-badge-title">NHBRC</div><div className="reg-badge-value">Accredited</div></div>
+            <div className="reg-badge"><div className="reg-badge-title">BCCEI</div><div className="reg-badge-value">Accredited</div></div>
           </div>
         </div>
       </section>
@@ -575,7 +577,7 @@ function App() {
               </div>
               <div className="contact-info-row">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.18 6.18l.9-.9a2 2 0 0 1 2.1-.45c.9.33 1.85.56 2.81.69a2 2 0 0 1 1.72 2.03z"/></svg>
-                <span><a href="tel:0783492494">078 349 2494</a><br/><a href="tel:0797870766">079 787 0766</a></span>
+                <span><a href="tel:0783492494">078 349 2494</a></span>
               </div>
             </div>
           </div>

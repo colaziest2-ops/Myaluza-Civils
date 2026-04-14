@@ -704,7 +704,7 @@
     .registrations-card {
       grid-column: span 2;
       display: flex;
-      gap: 2rem;
+      gap: 1rem;
       align-items: center;
       flex-wrap: wrap;
       background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
@@ -718,10 +718,10 @@
       background: rgba(255,255,255,0.08);
       border: 1.5px solid rgba(255,255,255,0.15);
       border-radius: 14px;
-      padding: 1.3rem 1.8rem;
+      padding: 1.1rem 1.2rem;
       text-align: center;
       flex: 1;
-      min-width: 140px;
+      min-width: 120px;
       transition: background 0.3s, border-color 0.3s;
     }
 
