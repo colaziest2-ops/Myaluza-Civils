@@ -6,11 +6,8 @@
   "framework": "vite",
   "redirects": [
     {
-      "source": "/:path*",
-      "has": [
-        { "type": "host", "value": "myaluza-civils.vercel.app" }
-      ],
-      "destination": "https://www.myaluzacivils.com/:path*",
+      "source": "/(.*)",
+      "destination": "https://www.myaluzacivils.com/$1",
       "permanent": true
     }
   ],
