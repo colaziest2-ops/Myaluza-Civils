@@ -7,12 +7,13 @@ import targetingImg from './assets/targeting.png';
 import bbbeeImg from './assets/BBBEE-White-Background.png';
 import civilEngImg from './assets/Civil Engineering.jpg';
 import generalBuildImg from './assets/General Building.jpg';
-import waterReticulationImg from './assets/Water Reticulation Network.jpg';
-import roadSurfacingImg from './assets/Road Surfacing & Kerbing.jpg';
-import commercialBuildingImg from './assets/Commercial Building Construction.jpg';
 import concreteImg from './assets/concrete retaining walls and culverts.jpg';
-import renovationsImg from './assets/Structural Renovations & Extensions.jpg';
 import pavingImg from './assets/Paving & Sidewalk Projects.jpg';
+import waterReticulationImg from './assets/Water Reticulation Network.jpg';
+import commercialBuildingImg from './assets/Commercial Building Construction.jpg';
+import renovationsImg from './assets/Structural Renovations & Extensions.jpg';
+import roadSurfacingImg from './assets/Road Surfacing & Kerbing.jpg';
+import { PortfolioGallery } from './components/PortfolioGallery.jsx';
 
 function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -105,7 +106,7 @@ function App() {
     setTimeout(ensureFaqVisible, 1500);
     setTimeout(ensureFaqVisible, 3000);
 
-    // Portfolio drag scroll
+    // Portfolio horizontal drag scroll
     const portfolioScroll = document.getElementById('portfolioScroll');
     if (portfolioScroll) {
       let isDown = false;
@@ -118,9 +119,13 @@ function App() {
         scrollLeft = portfolioScroll.scrollLeft;
       });
 
-      portfolioScroll.addEventListener('mouseleave', () => { isDown = false; });
-      portfolioScroll.addEventListener('mouseup', () => { isDown = false; });
-      
+      portfolioScroll.addEventListener('mouseleave', () => {
+        isDown = false;
+      });
+      portfolioScroll.addEventListener('mouseup', () => {
+        isDown = false;
+      });
+
       portfolioScroll.addEventListener('mousemove', (e) => {
         if (!isDown) return;
         e.preventDefault();
@@ -129,20 +134,30 @@ function App() {
         portfolioScroll.scrollLeft = scrollLeft - walk;
       });
 
-      portfolioScroll.addEventListener('touchstart', (e) => {
-        isDown = true;
-        startX = e.touches[0].pageX - portfolioScroll.offsetLeft;
-        scrollLeft = portfolioScroll.scrollLeft;
-      }, { passive: true });
+      portfolioScroll.addEventListener(
+        'touchstart',
+        (e) => {
+          isDown = true;
+          startX = e.touches[0].pageX - portfolioScroll.offsetLeft;
+          scrollLeft = portfolioScroll.scrollLeft;
+        },
+        { passive: true }
+      );
 
-      portfolioScroll.addEventListener('touchend', () => { isDown = false; });
+      portfolioScroll.addEventListener('touchend', () => {
+        isDown = false;
+      });
 
-      portfolioScroll.addEventListener('touchmove', (e) => {
-        if (!isDown) return;
-        const x = e.touches[0].pageX - portfolioScroll.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        portfolioScroll.scrollLeft = scrollLeft - walk;
-      }, { passive: true });
+      portfolioScroll.addEventListener(
+        'touchmove',
+        (e) => {
+          if (!isDown) return;
+          const x = e.touches[0].pageX - portfolioScroll.offsetLeft;
+          const walk = (x - startX) * 1.5;
+          portfolioScroll.scrollLeft = scrollLeft - walk;
+        },
+        { passive: true }
+      );
     }
 
     return () => {
@@ -389,7 +404,9 @@ function App() {
         <div className="portfolio-header">
           <div className="section-label">Our Work</div>
           <h2 className="section-title" id="portfolio-title">PROJECT <span style={{color:'var(--orange)'}}>SHOWCASE</span></h2>
-          <p style={{color:'var(--text-light)',fontSize:'0.88rem',marginTop:'1rem'}}>← Drag or swipe to explore our portfolio across KwaZulu-Natal</p>
+          <p style={{color:'var(--text-light)',fontSize:'0.88rem',marginTop:'1rem'}}>
+            ← Drag or swipe to explore our portfolio across KwaZulu-Natal
+          </p>
         </div>
         <div className="portfolio-scroll" id="portfolioScroll" role="list">
           <div className="portfolio-card" role="listitem">
@@ -440,6 +457,16 @@ function App() {
               <div className="portfolio-card-sub">Pietermaritzburg Region</div>
             </div>
           </div>
+        </div>
+
+        <div className="portfolio-gallery-below" aria-labelledby="portfolio-gallery-title">
+          <h3 className="portfolio-gallery-below-title" id="portfolio-gallery-title">
+            Browse by category
+          </h3>
+          <p className="portfolio-gallery-below-intro">
+            Filter the project gallery or open any photo full screen — use arrow keys or swipe in the lightbox.
+          </p>
+          <PortfolioGallery />
         </div>
       </section>
 
